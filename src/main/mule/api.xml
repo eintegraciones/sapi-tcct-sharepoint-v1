@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+    <flow name="sapi-tcct-sharepoint-main">
+        <http:listener config-ref="HTTPS_Listener_config_standard" path="${apiPath}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="sapi-tcct-sharepoint-config" />
+        <error-handler>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c5c3344b-2a4a-43b4-bc9f-3fec3afec8ca" when="vars.httpStatus &gt;= 500">
+                <set-variable value="${app.name}" doc:name="domain_notification" doc:id="42204fd2-44a9-4573-a5e0-0ac74a484bee" variableName="domain_notification" />
+                <set-variable value="#[&quot;ERROR &quot; ++ p(&quot;app.name&quot;) ++ &quot;: &quot; ++ error.description as String]" doc:name="message_notification" doc:id="11c7c096-becc-4f16-a37b-ee61f0d060f3" variableName="message_notification" />
+                <cloudhub:create-notification domain="#[vars.domain_notification default &quot;api-tcct-basic-template&quot;]" doc:name="Create Notification" doc:id="fbc307ed-4676-428e-b0ed-3f877e682f20" priority="ERROR">
+                    <cloudhub:message><![CDATA[#[vars.message_notification default ""]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="sapi-tcct-sharepoint-console">
+        <http:listener config-ref="HTTPS_Listener_config_standard" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="sapi-tcct-sharepoint-config" />
+        <error-handler>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="19279ad1-9522-497a-8bfc-3b2561995d41" when="vars.httpStatus &gt;= 500">
+                <set-variable value="${app.name}" doc:name="domain_notification" doc:id="be9de738-a018-491b-907a-6225e8e9161e" variableName="domain_notification" />
+                <set-variable value="#[&quot;ERROR &quot; ++ p(&quot;app.name&quot;) ++ &quot;: &quot; ++ error.description as String]" doc:name="message_notification" doc:id="c6c50776-7ca2-46a8-affc-7ea9402a4c5f" variableName="message_notification" />
+                <cloudhub:create-notification domain="#[vars.domain_notification default &quot;api-tcct-basic-template&quot;]" doc:name="Create Notification" doc:id="91a904f8-f13b-4a9a-a213-7dd7439d30e6" priority="ERROR">
+                    <cloudhub:message><![CDATA[#[vars.message_notification default ""]]]></cloudhub:message>
+                </cloudhub:create-notification>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\sharepoint\(file-name):multipart\form-data:sapi-tcct-sharepoint-config">
+        <flow-ref doc:name="Flow Reference" doc:id="3208da54-f3de-4451-b180-12d35fd23287" name="subflow-sharepoint-name-file-post" />
+    </flow>
+</mule>

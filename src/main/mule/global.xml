@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:amazon-lambda="http://www.mulesoft.org/schema/mule/amazon-lambda" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:sharepoint="http://www.mulesoft.org/schema/mule/sharepoint" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd http://www.mulesoft.org/schema/mule/amazon-lambda http://www.mulesoft.org/schema/mule/amazon-lambda/current/mule-amazon-lambda.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd http://www.mulesoft.org/schema/mule/sharepoint http://www.mulesoft.org/schema/mule/sharepoint/current/mule-sharepoint.xsd">
+    <apikit:config name="healthcheck-config" api="api\healthcheck.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="sapi-tcct-sharepoint-config" api="resource::fec2cd0e-9561-49a5-89d5-74b28062ae28:sapi-tcct-sharepoint:1.0.2:raml:zip:sapi-tcct-sharepoint.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="635bf38b-3391-4e05-b1f6-8f8019dc7440" environment="${mule.env}" contentFieldsDataMasking="client_secret" />
+    <configuration doc:name="Configuration" doc:id="69deda10-14cd-43be-af70-f529b48f4359" defaultErrorHandler-ref="Global_Error_Handler" />
+    <configuration-properties doc:name="Configuration properties" doc:id="8f76d0d4-1d6c-4cb8-a8a3-6764a1ed61c0" file="config\properties_plain.yaml" />
+    <http:listener-config name="HTTPS_Listener_config_standard" doc:name="HTTP Listener config" doc:id="e1a5ae2a-1333-4c14-9977-de974dea1f97">
+        <http:listener-connection host="0.0.0.0" port="${secure.port.external}" protocol="HTTPS">
+            <tls:context>
+                <tls:trust-store insecure="true" />
+                <tls:key-store type="${keystore.type}" path="${keystore.path}" alias="${keystore.alias}" keyPassword="${keystore.keyPassword}" password="${keystore.password}" />
+            </tls:context>
+        </http:listener-connection>
+    </http:listener-config>
+    <global-property doc:name="Global Property" doc:id="21a86305-6290-41ef-b6cc-7ea13dafcc61" name="autodiscoveryID" value="0" />
+    <api-gateway:autodiscovery apiId="${autodiscoveryID}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="3ea5fca5-23be-4b1d-a0f5-d7d89d541f05" flowRef="sapi-tcct-sharepoint-main" />
+    <global-property doc:name="Global Property" doc:id="9fe135ee-9de1-4c44-b61e-ead01cccc4ac" name="mule.env" value="int" />
+    <configuration-properties doc:name="Configuration properties" doc:id="0067b555-fc30-4a78-9845-d8b86443fa0b" file="config/properties-${mule.env}.yaml" />
+    <cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="8cc50554-45cb-45b5-95e1-58c35344a11f">
+        <cloudhub:connection environment="${cloudhub.env_id}" clientId="${cloudhub.client_id}" clientSecret="${cloudhub.client_secret}">
+            <reconnection>
+                <reconnect frequency="5000" count="3" />
+            </reconnection>
+        </cloudhub:connection>
+    </cloudhub:config>
+    <sharepoint:config name="Sharepoint_Mulesoft_4_Config" doc:name="Sharepoint Mulesoft 4 Config" doc:id="4110a738-ccab-4026-9b9b-3a817671560c">
+        <sharepoint:connection urlToken="${shaerpoint-tcct.urlToken}" clientId="${shaerpoint-tcct.client_id}" clientSecret="${shaerpoint-tcct.client_secret}" scope="${shaerpoint-tcct.scope}" />
+    </sharepoint:config>
+</mule>

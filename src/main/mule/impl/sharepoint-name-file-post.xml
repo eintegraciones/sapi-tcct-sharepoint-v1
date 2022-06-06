@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:sharepoint="http://www.mulesoft.org/schema/mule/sharepoint" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/sharepoint http://www.mulesoft.org/schema/mule/sharepoint/current/mule-sharepoint.xsd">
+	<sub-flow name="subflow-sharepoint-name-file-post" doc:id="d4d81016-2875-4557-8631-d758d81b0966" >
+		<json-logger:logger doc:name="START FLOW LOAD SHAREPOINT FILE" doc:id="f4adb19c-0452-4837-a8f6-2aaeaff906e0" config-ref="JSON_Logger_Config" message="START FLOW LOAD SHAREPOINT FILE"/>
+		<ee:transform doc:name="Read body" doc:id="1e9d7fbf-7781-4d5c-a03e-cf4d3f4dc34b" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="body" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	path: if (!isEmpty(payload.parts.path.content)) payload.parts.path.content as String ++ '/' else '',
+	permissions: payload.parts.permissions.content as String default 'N/A',
+	bytesFile: payload.parts.file default ''
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.'file-name' default '']" doc:name="name-file" doc:id="8f6e8fc9-561f-43e8-a3f0-53b1126037ce" variableName="name-file"/>
+		<validation:is-false doc:id="b1bcd80a-a1d4-4241-becb-ed994b6c36ae" expression="#[[' '] contains vars.&quot;name-file&quot;]" doc:name="Invalid Name File" message="#['Falta el parámetro &quot;name-file&quot;']"/>
+		<validation:is-false doc:name="Invalid File" doc:id="908c1fce-2165-4b4d-8d3d-956b37274df2" expression="#[[' '] contains vars.body.bytesFile.content]" message="'Falta el parámetro &quot;file&quot;'"/>
+		<validation:is-false doc:id="78f18698-fa2b-498e-b825-154c308e9745" expression="#[['N/A'] contains vars.body.permissions]" doc:name="Invalid Permissions" message="'Falta el parámetro &quot;permissions&quot;'"/>
+		<sharepoint:load-file-byte-base64 doc:name="LoadFile in Base64" doc:id="5bc95f3e-3df1-4bb8-a543-9d1b3c104072" config-ref="Sharepoint_Mulesoft_4_Config" nameSite="${shaerpoint-tcct.nameSite}" nameDrive="${shaerpoint-tcct.nameDrive}" nameFile='#[vars.body.path  ++ vars."name-file"]' byteBase64="#[vars.body.bytesFile.content]" permissions="#[vars.body.permissions]"/>
+		<ee:transform doc:name="Transform Message" doc:id="1dd57507-d50a-4501-9d03-dcc001e3a524">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  response: "Laod file SharePoint " + vars."name-file"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="END FLOW LOAD SHAREPOINT FILE" doc:id="ef3e242c-736b-4aec-abb0-7a72acb8291c" config-ref="JSON_Logger_Config" message="END FLOW LOAD SHAREPOINT FILE" tracePoint="END"/>
+	</sub-flow>
+</mule>
