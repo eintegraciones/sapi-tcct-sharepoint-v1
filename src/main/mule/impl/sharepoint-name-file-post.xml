@@ -9,7 +9,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
 http://www.mulesoft.org/schema/mule/sharepoint http://www.mulesoft.org/schema/mule/sharepoint/current/mule-sharepoint.xsd">
 	<sub-flow name="subflow-sharepoint-name-file-post" doc:id="d4d81016-2875-4557-8631-d758d81b0966" >
-		<json-logger:logger doc:name="START FLOW LOAD SHAREPOINT FILE" doc:id="f4adb19c-0452-4837-a8f6-2aaeaff906e0" config-ref="JSON_Logger_Config" message="START FLOW LOAD SHAREPOINT FILE"/>
+		<json-logger:logger doc:name="START FLOW LOAD SHAREPOINT FILE" doc:id="f4adb19c-0452-4837-a8f6-2aaeaff906e0" config-ref="JSON_Logger_Config" message="#['START FLOW LOAD SHAREPOINT FILE ' ++ attributes.uriParams.'file-name' default '']"/>
 		<ee:transform doc:name="Read body" doc:id="1e9d7fbf-7781-4d5c-a03e-cf4d3f4dc34b" >
 			<ee:message >
 			</ee:message>
