@@ -4,11 +4,11 @@ cloudhub:
   # Por seguridad, se informa por variable de entorno
   client_secret: ""
   
-shaerpoint-tcct:
-  urlToken: ""
-  client_id: ""
+sharepoint-tcct:
+  urlToken: "https://login.microsoftonline.com/9bf80022-c2b4-4952-a8bf-2cd5c6cef6df/oauth2/v2.0/token"
+  client_id: "063a7cbd-ff4e-4afd-828d-342857bc5829"
   # Por seguridad, se informa por variable de entorno
-  client_secret: ""
+  client_secret: "aR28Q~FOsuLOb0fOHCnlQUvLZ--AM3nCzRLiDaZu"
   scope: "https://graph.microsoft.com/.default openid"
-  nameSite: ""
-  nameDrive: ""
+  nameSite: "tcct-test"
+  nameDrive: "Documentos"
