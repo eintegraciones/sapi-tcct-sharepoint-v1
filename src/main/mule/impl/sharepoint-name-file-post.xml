@@ -28,14 +28,14 @@ output application/json
 		<validation:is-false doc:id="b1bcd80a-a1d4-4241-becb-ed994b6c36ae" expression="#[[' '] contains vars.&quot;name-file&quot;]" doc:name="Invalid Name File" message="#['Falta el parámetro &quot;name-file&quot;']"/>
 		<validation:is-false doc:name="Invalid File" doc:id="908c1fce-2165-4b4d-8d3d-956b37274df2" expression="#[[' '] contains vars.body.bytesFile.content]" message="'Falta el parámetro &quot;file&quot;'"/>
 		<validation:is-false doc:id="78f18698-fa2b-498e-b825-154c308e9745" expression="#[['N/A'] contains vars.body.permissions]" doc:name="Invalid Permissions" message="'Falta el parámetro &quot;permissions&quot;'"/>
-		<sharepoint:load-file-byte-base64 doc:name="LoadFile in Base64" doc:id="5bc95f3e-3df1-4bb8-a543-9d1b3c104072" config-ref="Sharepoint_Mulesoft_4_Config" nameSite="${shaerpoint-tcct.nameSite}" nameDrive="${shaerpoint-tcct.nameDrive}" nameFile='#[vars.body.path  ++ vars."name-file"]' byteBase64="#[vars.body.bytesFile.content]" permissions="#[vars.body.permissions]"/>
+		<sharepoint:load-file-byte-base64 doc:name="LoadFile in Base64" doc:id="5bc95f3e-3df1-4bb8-a543-9d1b3c104072" config-ref="Sharepoint_Mulesoft_4_Config" nameSite="${shaerpoint-tcct.nameSite}" nameDrive="${shaerpoint-tcct.nameDrive}" nameFile='#[vars.body.path ++ vars."name-file" as String]' byteBase64="#[vars.body.bytesFile.content]" permissions="#[vars.body.permissions]"/>
 		<ee:transform doc:name="Transform Message" doc:id="1dd57507-d50a-4501-9d03-dcc001e3a524">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-  response: "Laod file SharePoint " + vars."name-file"
+  response: "Laod file SharePoint " ++ vars."name-file"
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
