@@ -15,7 +15,7 @@
             <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c5c3344b-2a4a-43b4-bc9f-3fec3afec8ca" when="vars.httpStatus &gt;= 500">
                 <set-variable value="${app.name}" doc:name="domain_notification" doc:id="42204fd2-44a9-4573-a5e0-0ac74a484bee" variableName="domain_notification" />
                 <set-variable value="#[&quot;ERROR &quot; ++ p(&quot;app.name&quot;) ++ &quot;: &quot; ++ error.description as String]" doc:name="message_notification" doc:id="11c7c096-becc-4f16-a37b-ee61f0d060f3" variableName="message_notification" />
-                <cloudhub:create-notification domain="#[vars.domain_notification default &quot;api-tcct-basic-template&quot;]" doc:name="Create Notification" doc:id="fbc307ed-4676-428e-b0ed-3f877e682f20" priority="ERROR">
+                <cloudhub:create-notification domain="#[vars.domain_notification default &quot;api-tcct-basic-template&quot;]" doc:name="Create Notification" doc:id="fbc307ed-4676-428e-b0ed-3f877e682f20" priority="ERROR" config-ref="CloudHub_Config">
                     <cloudhub:message><![CDATA[#[vars.message_notification default ""]]]></cloudhub:message>
                 </cloudhub:create-notification>
             </on-error-propagate>
