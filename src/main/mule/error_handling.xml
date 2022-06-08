@@ -8,6 +8,30 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+	<sub-flow name="subflow_error_send_notifications" doc:id="f9e18796-7a72-4c27-81a8-7b12bb02f708" >
+		<set-variable value="${app.name}" doc:name="domain_notification" doc:id="a12029f7-54c3-4bdf-aee1-d1d0693e5ca0" variableName="domain_notification" />
+				<set-variable value='#["ERROR " ++ p("app.name") ++ ": " ++ error.description as String]' doc:name="message_notification" doc:id="2daeb4bf-bd6a-4009-9c04-9da939b17b12" variableName="message_notification" />
+				<ee:transform doc:name="response_error" doc:id="c75238d7-2117-426f-a8e8-1c27d24a287d" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="response_error" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<cloudhub:create-notification domain='#[vars.domain_notification default "api-tcct-basic-template"]' doc:name="Create Notification" doc:id="9de0b055-f3e6-41a1-975d-050d1c9a7964" config-ref="CloudHub_Config" priority="ERROR" >
+					<cloudhub:message ><![CDATA[#[vars.message_notification default ""]]]></cloudhub:message>
+				</cloudhub:create-notification>
+				<ee:transform doc:name="Payload" doc:id="8ec41274-072c-4092-8258-cadff2e1c772" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.response_error default { error: vars.httpStatus}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+	</sub-flow>
 	<error-handler name="Global_Error_Handler">
 		<on-error-propagate type="APIKIT:BAD_REQUEST"
 			enableNotifications="true" logException="true" doc:name="On BAD_REQUEST Error Propagate">
@@ -107,6 +131,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 					<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="21ad4a0f-7117-430e-b758-fc13dd64d39c" name="subflow_error_send_notifications"/>
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true"
 			logException="true" doc:name="On TIMEOUT Error Propagate"
@@ -200,6 +225,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 					<ee:set-variable variableName="httpStatus"><![CDATA[503]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="10c49919-0c78-4d32-8956-54a2683ef48c" name="subflow_error_send_notifications"/>
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true"
 			logException="true" doc:name="On UNAUTHORIZED Error Propagate"
@@ -280,6 +306,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="564951fa-a1f4-4051-bb8e-010a52083f09" name="subflow_error_send_notifications"/>
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On GATEWAY_TIMEOUT Error Propagate" doc:id="19d30614-3770-4c03-841c-90d30894ad0c" type="HTTP:GATEWAY_TIMEOUT">
 			<ee:transform doc:name="Output 504 Error" doc:id="ae6a6a1a-7cdb-4a10-893c-001f119dcafe">
@@ -290,6 +317,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 					<ee:set-variable variableName="httpStatus"><![CDATA[504]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="4bee86fa-406d-4540-8c3f-38cec10604f0" name="subflow_error_send_notifications"/>
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On ANY Error Propagate" doc:id="01bda6be-e3c9-49b4-a545-8fa6dd21a039" type="HTTP:INTERNAL_SERVER_ERROR">
 			<ee:transform doc:name="Output 500 Error" doc:id="ca1ab85d-d7de-48eb-949e-16798255678b">
@@ -300,6 +328,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="812f0934-22cd-4a11-8ba7-e8ec7f7d5291" name="subflow_error_send_notifications"/>
 		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On ANY Error Propagate" doc:id="a90fd8f6-b066-4de2-a52f-0806094e8269">
 			<ee:transform doc:name="Output 500 Error" doc:id="884ee4bd-baf2-4a56-94f9-19ec34dcf0ec">
@@ -310,6 +339,7 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="bd54ccde-e942-4c9e-a0ad-dcd8758e3c6f" name="subflow_error_send_notifications"/>
 		</on-error-propagate>
 	</error-handler>
 
