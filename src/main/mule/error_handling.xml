@@ -281,10 +281,20 @@ http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On INTERNAL_SERVER_ERROR Error Propagate" doc:id="19d30614-3770-4c03-841c-90d30894ad0c" type="HTTP:INTERNAL_SERVER_ERROR">
-			<ee:transform doc:name="Output 500 Error" doc:id="ae6a6a1a-7cdb-4a10-893c-001f119dcafe">
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On GATEWAY_TIMEOUT Error Propagate" doc:id="19d30614-3770-4c03-841c-90d30894ad0c" type="HTTP:GATEWAY_TIMEOUT">
+			<ee:transform doc:name="Output 504 Error" doc:id="ae6a6a1a-7cdb-4a10-893c-001f119dcafe">
 				<ee:message>
-					<ee:set-payload resource="dataweave/error/http/http_500_internal_server_error.dwl" />
+					<ee:set-payload resource="dataweave/error/http/http_504_gateway_timeout.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[504]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On ANY Error Propagate" doc:id="01bda6be-e3c9-49b4-a545-8fa6dd21a039" type="HTTP:INTERNAL_SERVER_ERROR">
+			<ee:transform doc:name="Output 500 Error" doc:id="ca1ab85d-d7de-48eb-949e-16798255678b">
+				<ee:message>
+					<ee:set-payload resource="dataweave/error/app/app_500_internal_server_error.dwl" />
 				</ee:message>
 				<ee:variables>
 					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
