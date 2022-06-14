@@ -105,7 +105,7 @@
 		<dependency>
 			<groupId>fec2cd0e-9561-49a5-89d5-74b28062ae28</groupId>
 			<artifactId>mule-sharepoint-connector</artifactId>
-			<version>1.1.2</version>
+			<version>1.1.6</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
