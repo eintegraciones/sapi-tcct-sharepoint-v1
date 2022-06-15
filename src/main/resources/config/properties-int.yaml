@@ -1,0 +1,14 @@
+cloudhub:
+  env_id: "026101c2-522a-4ebc-8ca8-8ae3bc565426"
+  client_id: "79314592f7cb4944bb059af6dda16e29"
+  # Por seguridad, se informa por variable de entorno
+  client_secret: ""
+  
+sharepoint-tcct:
+  urlToken: ""
+  client_id: ""
+  # Por seguridad, se informa por variable de entorno
+  client_secret: ""
+  scope: "https://graph.microsoft.com/.default openid"
+  nameSite: ""
+  nameDrive: ""
