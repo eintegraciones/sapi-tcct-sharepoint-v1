@@ -118,7 +118,7 @@ output application/json
 	<sub-flow name="getProperties" doc:id="8a59fafc-9967-4cb6-a936-a9dedebb2d82" >
 		<validation:is-null doc:name="Is null" doc:id="1c12ea68-ba15-4e99-ad26-0b29a68e279d" value="#[vars.key_found]" message="OS:NOT_KEY_FOUND"/>
 		<os:retrieve-all doc:name="Retrieve all" doc:id="3351c688-7b5b-4cc0-8e4f-ba38b6d81401" target="propertiesids" objectStore="OS_PROPERTYS"/>
-		<logger level="INFO" doc:name="Properties objectstore" doc:id="02a74196-809d-41fd-a445-434cb825bf83" message="#[vars.propertiesids default 'none111']" />
+		<logger level="INFO" doc:name="Properties objectstore" doc:id="02a74196-809d-41fd-a445-434cb825bf83" message="get Properties objectstore" />
 		<ee:transform doc:name="Set properties objectsotre" doc:id="8be03a56-1f86-4185-b330-5eaab32d6a36">
 					<ee:message>
 					</ee:message>
@@ -132,6 +132,6 @@ output application/json
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-		<logger level="INFO" doc:name="Check value secret" doc:id="e49a46b2-a7e0-40e7-9896-cac06ad23dee" message='#[vars.properties."sharepoint-tcct.client_secret"]' />
+		<logger level="DEBUG" doc:name="Check value secret" doc:id="e49a46b2-a7e0-40e7-9896-cac06ad23dee" message='#[vars.properties]' />
 	</sub-flow>
 </mule>
