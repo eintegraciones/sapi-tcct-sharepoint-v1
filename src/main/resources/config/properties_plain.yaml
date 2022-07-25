@@ -1,5 +1,6 @@
 apiPath: "/api/v1/*"
 apiTestPath: "/api/v1/"
+apiKeysPath: "/os/v1/*"
 apiName: "${app.name}"
 
 standard:

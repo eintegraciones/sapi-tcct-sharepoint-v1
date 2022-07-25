@@ -25,6 +25,6 @@
         </cloudhub:connection>
     </cloudhub:config>
     <sharepoint:config name="Sharepoint_Mulesoft_4_Config" doc:name="Sharepoint Mulesoft 4 Config" doc:id="4110a738-ccab-4026-9b9b-3a817671560c">
-        <sharepoint:connection urlToken="${sharepoint-tcct.urlToken}" clientId="${sharepoint-tcct.client_id}" clientSecret="${sharepoint-tcct.client_secret}" scope="${sharepoint-tcct.scope}" />
+        <sharepoint:connection urlToken="${sharepoint-tcct.urlToken}" clientId="${sharepoint-tcct.client_id}" clientSecret='#[vars.properties."sharepoint-tcct.client_secret"]' scope="${sharepoint-tcct.scope}" />
     </sharepoint:config>
 </mule>

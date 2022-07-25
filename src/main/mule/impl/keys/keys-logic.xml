@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="6273cc88-2883-4bc0-b44f-77b74edc4b0c" >
+		<os:connection >
+			<reconnection />
+		</os:connection>
+	</os:config>
+	<os:object-store name="OS_PROPERTYS" doc:name="Object store" doc:id="de9026d5-90f9-423e-acf0-800d544b8f79" config-ref="ObjectStore_Config" />
+	<sub-flow name="keys-logic-all-post" doc:id="6946f7ac-1e86-428a-a742-b1631b74dd81" >
+		<json-logger:logger doc:name="START LOAD ALL SECRET IN OS" doc:id="c195bdd3-2767-4f20-bbcc-f003fce6706b" config-ref="JSON_Logger_Config" message="START LOAD ALL SECRET IN OS"/>
+		<validation:is-false doc:name="Body not empty" doc:id="66ca3e01-5b54-4ba7-a8a8-1ab96bf6cf08" expression="#[isEmpty(payload default '')]" message="El body no puede estar vacio."/>
+		<ee:transform doc:name="Body to text" doc:id="e71206aa-face-4cab-a719-9715ff72bed8" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="jKeys" ><![CDATA[%dw 2.0
+import fromBase64 from dw::core::Binaries
+output application/json
+---
+read(payload,"application/json")]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<os:clear doc:name="Clear" doc:id="7fbc5163-9260-4cd7-8a08-59bac95d14fe" objectStore="OS_PROPERTYS"/>
+		<foreach doc:name="For Each" doc:id="f8efc592-01fb-4ba6-a67c-3d4d322bad20" collection="#[vars.jKeys]">
+			<ee:transform doc:name="KEY/VALUE PAYLOAD" doc:id="c6ff5d6a-5ffa-478a-9a9b-268245fb5c21" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="key" ><![CDATA[%dw 2.0
+output application/java
+---
+keysOf(payload)[0] as String]]></ee:set-variable>
+					<ee:set-variable variableName="value" ><![CDATA[%dw 2.0
+output application/java
+---
+valuesOf(payload)[0] as String]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Decrypt value RAS" doc:id="634cba26-2b3a-404e-807b-8f28fbb1a313">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="value"><![CDATA[%dw 2.0
+import java!com::tcct::decypty::DecryptTCCT
+output application/java
+---
+DecryptTCCT::decrypt(vars.value as String, p("privateKey"))]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<json-logger:logger doc:name="KEY LOAD" doc:id="8a5b6d05-181a-4c5b-8a3d-3f574409cc54" config-ref="JSON_Logger_Config" message="#['KEY LOAD: ' ++  vars.key default '']" tracePoint="FLOW" priority="DEBUG"/>
+			<os:store doc:name="Load secret" doc:id="2c96f8ef-ef3d-4932-a439-38a584b4bfed" key="#[vars.key]" objectStore="OS_PROPERTYS">
+				<os:value ><![CDATA[#[vars.value]]]></os:value>
+			</os:store>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="843d9052-35d3-4aad-b771-824dc45a0471" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  response: "la carga de las claves a sido existosa"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="END LOAD ALL SECRTE IN OS" doc:id="3de54a6f-608b-4d26-bf9d-7b2390d74efc" config-ref="JSON_Logger_Config" message="END LOAD ALL SECRTE IN OS" tracePoint="END"/>
+	</sub-flow>
+	<sub-flow name="keys-logic-one-put" doc:id="f219b98a-3acb-4f16-922f-38993403345b" >
+		<json-logger:logger doc:name="START LOAD ONE SECRET IN OS" doc:id="5f1a6a0f-bf70-49d3-9746-e68cc0156af6" config-ref="JSON_Logger_Config" message="START LOAD ONE SECRET IN OS"/>
+		<ee:transform doc:name="key" doc:id="683be12c-2cc0-4c2b-b97b-645c039d402a">
+			<ee:variables>
+				<ee:set-variable variableName="key"><![CDATA[attributes.uriParams.'key']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<validation:is-false doc:name="Body not empty" doc:id="f5570b0f-511a-41c5-aa49-2661eda1e2a0" expression="#[isEmpty(payload default '')]" message="El body no puede estar vacio." />
+		<ee:transform doc:name="Decrypt value RAS" doc:id="1401ed66-98e2-4a1a-8572-89de98aa6e2e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="value_new" ><![CDATA[%dw 2.0
+import java!com::tcct::decypty::DecryptTCCT
+output application/java
+---
+DecryptTCCT::decrypt(payload as String, p("privateKey"))]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<os:retrieve doc:name="Retrieve" doc:id="22c0cb6f-fce0-4706-ad6d-ec3b7b642498" key="#[vars.key]" target="value_old" objectStore="OS_PROPERTYS">
+			<os:default-value ><![CDATA[NOT FOUND]]></os:default-value>
+		</os:retrieve>
+		<choice doc:name="Choice" doc:id="2c93a279-35af-41eb-bc06-aba69baae866" >
+			<when expression="#[vars.value_old == 'NOT FOUND']">
+				<set-variable value="la carga de la clave nueva a sido correcta" doc:name="message_response" doc:id="2030a54c-d826-43d9-b165-1f854e26e1d7" variableName="message_response"/>
+			</when>
+			<otherwise>
+				<set-variable value="el remplazo de la clave a sido correcta" doc:name="message_response" doc:id="382d818d-37e7-431b-a995-b94ee811575d" variableName="message_response"/>
+			</otherwise>
+		</choice>
+		<os:store doc:name="Load secret" doc:id="da658ad2-415f-46ab-8601-9d8e437c6ad6" key="#[vars.key]" objectStore="OS_PROPERTYS">
+			<os:value><![CDATA[#[vars.value_new as String]]]></os:value>
+		</os:store>
+		<ee:transform doc:name="Transform Message" doc:id="fa03594f-93e8-4274-9714-4a3e8bf8cd3c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  response: vars.message_response default '200'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="END LOAD ONE SECRET IN OS" doc:id="be32c245-8856-4def-88c6-481b4860afcd" config-ref="JSON_Logger_Config" message="END LOAD ONE SECRET IN OS" tracePoint="END"/>
+	</sub-flow>
+	<sub-flow name="getProperties" doc:id="8a59fafc-9967-4cb6-a936-a9dedebb2d82" >
+		<validation:is-null doc:name="Is null" doc:id="1c12ea68-ba15-4e99-ad26-0b29a68e279d" value="#[vars.key_found]" message="OS:NOT_KEY_FOUND"/>
+		<os:retrieve-all doc:name="Retrieve all" doc:id="3351c688-7b5b-4cc0-8e4f-ba38b6d81401" target="propertiesids" objectStore="OS_PROPERTYS"/>
+		<logger level="INFO" doc:name="Properties objectstore" doc:id="02a74196-809d-41fd-a445-434cb825bf83" message="#[vars.propertiesids default 'none111']" />
+		<ee:transform doc:name="Set properties objectsotre" doc:id="8be03a56-1f86-4185-b330-5eaab32d6a36">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="properties"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"sharepoint-tcct.client_secret": vars.propertiesids[p("sharepoint-tcct.client_id")] as String replace /^"/ with("") replace /"$/ with("") default p("sharepoint-tcct.client_secret"),
+	"cloudhub.client_secret": vars.propertiesids[p("cloudhub.client_id")] as String replace /^"/ with("") replace /"$/ with("") default p("cloudhub.client_secret")	
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+		<logger level="INFO" doc:name="Check value secret" doc:id="e49a46b2-a7e0-40e7-9896-cac06ad23dee" message='#[vars.properties."sharepoint-tcct.client_secret"]' />
+	</sub-flow>
+</mule>

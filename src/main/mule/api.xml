@@ -25,6 +25,7 @@
         <apikit:console config-ref="sapi-tcct-sharepoint-config" />
     </flow>
     <flow name="post:\sharepoint\(file-name):multipart\form-data:sapi-tcct-sharepoint-config">
-        <flow-ref doc:name="Flow Reference" doc:id="3208da54-f3de-4451-b180-12d35fd23287" name="subflow-sharepoint-name-file-post" />
+        <flow-ref doc:name="Flow GETPROPERTIES OBJECTSOTRE" doc:id="6d62e0e4-3534-446a-860f-e4ad4bbe5393" name="getProperties"/>
+		<flow-ref doc:name="Flow Reference" doc:id="3208da54-f3de-4451-b180-12d35fd23287" name="subflow-sharepoint-name-file-post" />
     </flow>
 </mule>
