@@ -64,7 +64,7 @@ DecryptTCCT::decrypt(vars.value as String, p("privateKey"))]]></ee:set-variable>
 output application/json
 ---
 {
-  response: "la carga de las claves a sido existosa"
+  response: "la carga de las claves ha sido existosa"
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
@@ -94,10 +94,10 @@ DecryptTCCT::decrypt(payload as String, p("privateKey"))]]></ee:set-variable>
 		</os:retrieve>
 		<choice doc:name="Choice" doc:id="2c93a279-35af-41eb-bc06-aba69baae866" >
 			<when expression="#[vars.value_old == 'NOT FOUND']">
-				<set-variable value="la carga de la clave nueva a sido correcta" doc:name="message_response" doc:id="2030a54c-d826-43d9-b165-1f854e26e1d7" variableName="message_response"/>
+				<set-variable value="la carga de la clave nueva ha sido correcta" doc:name="message_response" doc:id="2030a54c-d826-43d9-b165-1f854e26e1d7" variableName="message_response"/>
 			</when>
 			<otherwise>
-				<set-variable value="el remplazo de la clave a sido correcta" doc:name="message_response" doc:id="382d818d-37e7-431b-a995-b94ee811575d" variableName="message_response"/>
+				<set-variable value="el remplazo de la clave ha sido correcta" doc:name="message_response" doc:id="382d818d-37e7-431b-a995-b94ee811575d" variableName="message_response"/>
 			</otherwise>
 		</choice>
 		<os:store doc:name="Load secret" doc:id="da658ad2-415f-46ab-8601-9d8e437c6ad6" key="#[vars.key]" objectStore="OS_PROPERTYS">
