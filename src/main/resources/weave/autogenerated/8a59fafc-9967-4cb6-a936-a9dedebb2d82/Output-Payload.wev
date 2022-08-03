@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_8a59fafc_9967_4cb6_a936_a9dedebb2d82_Output_Payload = {
+  path: String, 
+  file: String, 
+  permissions: String, 
+  _?: Any
+}
+

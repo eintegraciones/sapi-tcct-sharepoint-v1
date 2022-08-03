@@ -18,13 +18,13 @@
     <global-property doc:name="Global Property" doc:id="9fe135ee-9de1-4c44-b61e-ead01cccc4ac" name="mule.env" value="int" />
     <configuration-properties doc:name="Configuration properties" doc:id="0067b555-fc30-4a78-9845-d8b86443fa0b" file="config/properties-${mule.env}.yaml" />
     <cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="8cc50554-45cb-45b5-95e1-58c35344a11f">
-        <cloudhub:connection environment="${cloudhub.env_id}" clientId="${cloudhub.client_id}" clientSecret="${cloudhub.client_secret}">
+        <cloudhub:connection environment="${cloudhub.env_id}" clientId="${cloudhub.client_id}" clientSecret='#[vars.properties."cloudhub.client_secret"]'>
             <reconnection>
                 <reconnect frequency="5000" count="3" />
             </reconnection>
         </cloudhub:connection>
     </cloudhub:config>
     <sharepoint:config name="Sharepoint_Mulesoft_4_Config" doc:name="Sharepoint Mulesoft 4 Config" doc:id="4110a738-ccab-4026-9b9b-3a817671560c">
-        <sharepoint:connection urlToken="${sharepoint-tcct.urlToken}" clientId="${sharepoint-tcct.client_id}" clientSecret="${sharepoint-tcct.client_secret}" scope="${sharepoint-tcct.scope}" />
+        <sharepoint:connection urlToken="${sharepoint-tcct.urlToken}" clientId="${sharepoint-tcct.client_id}" clientSecret='#[vars.properties."sharepoint-tcct.client_secret"]' scope="${sharepoint-tcct.scope}" />
     </sharepoint:config>
 </mule>
